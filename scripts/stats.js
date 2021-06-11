@@ -178,9 +178,21 @@ async function fetchMiniStats() {
 
 // Loading the mini stats
 function loadMiniStats(results) {
-    document.querySelector("#documents").innerHTML = numberWithCommas(results[0].sum);
-    document.querySelector("#sentences").innerHTML = numberWithCommas(results[0].lauseid);
-    document.querySelector("#words").innerHTML = numberWithCommas(results[0].sonu);
+    if(results == null){
+        document.querySelector("#documents").innerHTML = "0";
+        document.querySelector("#sentences").innerHTML = "0";
+        document.querySelector("#words").innerHTML = "0";
+    }
+    else if(results[0].sum != 0) {
+        document.querySelector("#documents").innerHTML = numberWithCommas(results[0].sum);
+        document.querySelector("#sentences").innerHTML = numberWithCommas(results[0].lauseid);
+        document.querySelector("#words").innerHTML = numberWithCommas(results[0].sonu);
+
+    }else{
+        document.querySelector("#documents").innerHTML = "0";
+        document.querySelector("#sentences").innerHTML = "0";
+        document.querySelector("#words").innerHTML = "0";
+    }
 }
 
 // Number beautifier. For example: '123456789' into '123,456,789'
@@ -253,6 +265,7 @@ async function selectKorpus() {
 
 // Checkbox style manipulation (unchecks everything)
 function deselectKorpus() {
+    let result2 = null;
     let checkboxes = document.querySelectorAll('input[name=korpus]');
     for (i = 0; i < checkboxes.length; i++) {
         checkboxes[i].checked = false;
@@ -262,10 +275,12 @@ function deselectKorpus() {
     }
     var y = document.getElementById('alamkorpused');
     y.style.display = "none";
+    loadMiniStats(result2);
 }
 
 // Collects every selected korpus checkbox, styles them and then fetches appropriate stats
 async function updateKorpusCheckboxes() {
+    var y = document.getElementById('alamkorpused');
     filter = document.querySelector("#filterBy").value;
     selectedKorpus = [];
     let checkboxes = document.querySelectorAll('input[name=korpus]:checked');
@@ -293,8 +308,7 @@ async function updateKorpusCheckboxes() {
         await fetchSome();
     }
     await fetchMiniStats();
-    var y = document.getElementById('alamkorpused');
-    y.style.display = "block";
+   
 }
 
 // AJAX for fetching data from SELECTED korpuses
