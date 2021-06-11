@@ -1,20 +1,16 @@
-
 // global variables
 let selectedKorpus = []; // every selected korpus
 let knames = []; // every selected korpus name
 let filter = document.querySelector("#filterBy").value; // current filter
 const helpToggle = document.getElementById('help-toggle');
+
 // On page load
 $(document).ready(async function () {
     // initial fetchers on page load, to display stats
-
     // main stats
     updateKorpusCheckboxes();
+    // await fetchAll();
     await fetchMiniStats();
-
-    // pie chart
-    let langData = await fetchLanguagePercentage();
-    loadLanguagePercentage(langData);
 
     // event listeners
     document.querySelectorAll('input[name=korpus]')
@@ -23,28 +19,8 @@ $(document).ready(async function () {
     document.querySelector("#selectAllKorpus").addEventListener("click", selectKorpus);
     document.querySelector("#unselectAllKorpus").addEventListener("click", deselectKorpus);
     document.querySelector("#filterBy").addEventListener("change", updateFilter);
-    helpToggle.addEventListener('click', show);       
-    
+    helpToggle.addEventListener('click', show); 
 });
-
-// AJAX for fetching mini stats
-async function fetchMiniStats() {
-    filter = document.querySelector("#filterBy").value;
-    let result;
-    try {
-        result = await $.ajax({
-            url: "db/server.php",
-            type: "POST",
-            data: { fetchMiniStats: selectedKorpus, fetchValue: filter },
-            dataType: 'JSON',
-        });
-        console.log(selectedKorpus)
-        console.log("AJAX: Fetching selected korpus mini stats... " + JSON.stringify(result));
-        loadMiniStats(result);
-    } catch (error) {
-        console.error(error);
-    }
-}
 
 function show(){
     if(helpToggle.innerText == ('Kuva abi')){
@@ -71,6 +47,135 @@ function show(){
     }
 }
 
+function readfilter2fromDB(selectionimistasaab){         
+    document.getElementById('SecondFilterSelection').innerHTML="";
+    console.log('olenpede');
+    var x = document.getElementById("filters");
+    let list1=['Tundmatu', 'Ei', 'Ja'];
+    let list2=['Tundmatu', 'Mees', 'Naine'];
+    let muutuja = [];
+    
+    if(selectionimistasaab =='sugu'){
+        muutuja = list2;
+        x.style.display = "block";
+    }
+    else if(selectionimistasaab =='abivahendid'){
+        muutuja = list1;
+        x.style.display = "block";
+    }
+    else{
+        x.style.display = "none";
+    }
+    console.log(selectionimistasaab);
+    var docFrag = document.createDocumentFragment();
+
+    for(var x = 0; x < muutuja.length; x++){
+        var button = document.createElement('input');
+        button.setAttribute('type', 'checkbox');
+        button.setAttribute('name', selectionimistasaab);
+        button.setAttribute('value', muutuja[x]);
+        button.setAttribute('class', 'btn-check');
+        button.setAttribute('id', ("btn-check22"+x));
+        button.setAttribute('autocomplete', 'off');
+        button.setAttribute('checked', '');
+
+        docFrag.appendChild(button);
+
+        var button2 = document.createElement('label');
+        button2.setAttribute('class', 'checkbox');
+        button2.setAttribute('for', ("btn-check22"+x));
+        var button3 = document.createElement('i');
+        button3.setAttribute('class', 'fas fa-check');
+
+        button2.appendChild(button3);
+
+        var button4 = document.createElement('span');
+        button4.innerHTML = muutuja[x];
+        button2.appendChild(button4);
+
+        docFrag.appendChild(button2);
+
+    }
+    
+    document.getElementById('SecondFilterSelection').appendChild(docFrag); 
+    document.querySelectorAll('input[name='+selectionimistasaab+']')
+        .forEach(el => el
+            .addEventListener('click', updateFilter2Checkboxes));
+    console.log("kuulan");
+
+    document.querySelector("#selectAllChoices").addEventListener("click", selectFilter2Checkboxes);
+    document.querySelector("#unselectAllChoices").addEventListener("click", deselectFilter2Checkboxes);
+
+}
+
+async function updateFilter2Checkboxes() {
+    filter = document.querySelector("#filterBy").value;
+    let checkboxes = document.querySelectorAll('input[name='+filter+']:checked');
+    let allCheckboxes = document.querySelectorAll('input[name='+filter+']');
+    for (let i = 0; i < allCheckboxes.length; i++) {
+        let next = allCheckboxes[i].nextElementSibling.firstChild;
+        next.classList.add("hidden");
+    }
+    if (checkboxes.length == 0) {
+        for (i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = true;
+            let next = checkboxes[i].nextElementSibling.firstChild;
+            next.classList.remove("hidden");
+        }
+    } else {
+        for (let i = 0; i < checkboxes.length; i++) {
+            let next = checkboxes[i].nextElementSibling.firstChild;
+            next.classList.remove("hidden");
+        }
+    }
+
+}
+
+// Checkbox style manipulation (checks everything), then fetches all stats
+async function selectFilter2Checkboxes() {
+    filter = document.querySelector("#filterBy").value;
+    let checkboxes = document.querySelectorAll('input[name='+filter+']');
+    for (i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = true;
+        let next = checkboxes[i].nextElementSibling.firstChild;
+        next.classList.remove("hidden");
+        next.classList.remove("add");
+        console.log("added " + next);
+    }
+}
+
+// Checkbox style manipulation (unchecks everything)
+function deselectFilter2Checkboxes() {
+    let checkboxes = document.querySelectorAll('input[name='+filter+']');
+    for (i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false;
+        let next = checkboxes[i].nextElementSibling.firstChild;
+        next.classList.add("hidden");
+        console.log("removed " + next);
+
+    }
+
+}
+
+// AJAX for fetching mini stats
+async function fetchMiniStats() {
+    filter = document.querySelector("#filterBy").value;
+    let result;
+    try {
+        result = await $.ajax({
+            url: "/api/texts/getMiniStats",
+            type: "GET",
+            data: { corpus: selectedKorpus.join() },
+        });
+        console.log("ministats " + result)
+        console.log("AJAX: Fetching selected korpus mini stats... " + JSON.stringify(result));
+        loadMiniStats(JSON.parse(result));
+    } catch (error) {
+        console.error(error);
+        console.log("ministats FAIL" + result)
+    }
+}
+
 // Loading the mini stats
 function loadMiniStats(results) {
     document.querySelector("#documents").innerHTML = numberWithCommas(results[0].sum);
@@ -80,12 +185,13 @@ function loadMiniStats(results) {
 
 // Number beautifier. For example: '123456789' into '123,456,789'
 function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
 // updates the stats title, beautifies them, then executes checkbox updater
 function updateFilter() {
     filter = document.querySelector("#filterBy").value;
+    readfilter2fromDB(filter);
     let beautify;
     switch (filter) {
         case "vanus":
@@ -139,8 +245,10 @@ async function selectKorpus() {
         next.classList.remove("add");
         console.log("added " + next);
     }
-    await fetchAll();
+    await updateKorpusCheckboxes();
     await fetchMiniStats();
+    var y = document.getElementById('alamkorpused');
+    y.style.display = "block";
 }
 
 // Checkbox style manipulation (unchecks everything)
@@ -152,6 +260,8 @@ function deselectKorpus() {
         next.classList.add("hidden");
         console.log("removed " + next);
     }
+    var y = document.getElementById('alamkorpused');
+    y.style.display = "none";
 }
 
 // Collects every selected korpus checkbox, styles them and then fetches appropriate stats
@@ -172,66 +282,35 @@ async function updateKorpusCheckboxes() {
             next.classList.remove("hidden");
         }
         //get data for all
-        await fetchAll();
+        await fetchSome();
     } else {
         for (let i = 0; i < checkboxes.length; i++) {
             selectedKorpus.push(checkboxes[i].defaultValue);
             let next = checkboxes[i].nextElementSibling.firstChild;
             next.classList.remove("hidden");
         }
-        knames = await fetchKorpusNames(selectedKorpus);
+        // knames = await fetchKorpusNames(selectedKorpus);
         await fetchSome();
     }
     await fetchMiniStats();
-}
-
-// fetches Korpus names, used in updateKorpusCheckboxes()
-async function fetchKorpusNames(korpusCodes) {
-    let result;
-    try {
-        result = await $.ajax({
-            url: "db/server.php",
-            type: "POST",
-            data: { fetchKorpusName: true, selectedKorpus: korpusCodes },
-            dataType: 'JSON',
-        });
-        console.log("AJAX: Fetching names...: " + result);
-        return result;
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-
-// AJAX for fetching data from ALL korpuses
-async function fetchAll() {
-    let result;
-    try {
-        result = await $.ajax({
-            url: "db/server.php",
-            type: "POST",
-            data: { fetchAll: true, fetchValue: filter },
-            dataType: 'JSON',
-        });
-        loadStats(result);
-        console.log("AJAX: Fetching all korpus data... " + JSON.stringify(result));
-    } catch (error) {
-        console.error(error);
-    }
+    var y = document.getElementById('alamkorpused');
+    y.style.display = "block";
 }
 
 // AJAX for fetching data from SELECTED korpuses
 async function fetchSome() {
+    console.log(selectedKorpus.join())
+    console.log(selectedKorpus)
     let result;
     try {
         result = await $.ajax({
-            url: "db/server.php",
-            type: "POST",
-            data: { fetchSome: selectedKorpus, fetchValue: filter },
-            dataType: 'JSON',
+            url: "/api/texts/getDetailedValues",
+            type: "GET",
+            data: { corpus: selectedKorpus.join(), pName: filter},
+            // dataType: 'JSON'
         });
-        loadStats(result);
-        console.log("AJAX: Fetching selected korpus data...");
+        loadStats(JSON.parse(result));
+        console.log("ajax successful, parsed data: " + result)
     } catch (error) {
         console.error(error);
     }
@@ -260,10 +339,10 @@ function loadStats(data) {
 
     // filter gained data
     filterData.forEach((e) => {
-        if (e[filter] == null) {
+        if (e.value == "") {
             ages.push("TUNDMATU");
         } else {
-            ages.push(e[filter]
+            ages.push(e.value
                 .replace(/y/g, "ü")
                 .toUpperCase());
         }
@@ -299,7 +378,7 @@ function loadStats(data) {
         myChart.resize();
     });
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  // chart settings
+    // chart settings
     option = {
         color: colors,
 
@@ -310,10 +389,6 @@ function loadStats(data) {
         calculatable: true,
 
         tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'cross'
-            }
         },
         grid: {
             containLabel: true,
@@ -327,8 +402,8 @@ function loadStats(data) {
             itemSize: 30,
             itemGap: 35,
             feature: {
-                dataView: { show: true, readOnly: true, title: "Andmete tabel" },
-                saveAsImage: { show: true, title: "Graafiku allalaadimine", color: "red" },
+                dataView: { show: true, readOnly: true, title: "Andmed" },
+                saveAsImage: { show: true, title: "Laadi alla", color: "red" },
                 magicType: {
                     show: true,
                     type: ['line', 'bar'],
@@ -361,104 +436,117 @@ function loadStats(data) {
         ],
         yAxis: [
             {
-                // show: false,
+                //show: false,
                 type: 'value',
-                name: 'Protsent',
+                name: '',
+                
                 position: 'right',
                 axisLine: {
                     show: true,
                     lineStyle: {
-                        color: colors[0],
+                        color: colors[1],
                         fontSize: 18
                     }
                 },
                 axisLabel: {
-                    // containLabel: true,
-                    formatter: '{value} %'
+                    show: false,
+                    //containLabel: true,
+                    formatter: ''
                 }
             },
             {
-                show: false,
+                //show: false,
                 type: 'value',
-                name: 'Tekste',
+                name: '',
+                
                 position: 'right',
-                offset: 45,
                 axisLine: {
                     show: true,
                     lineStyle: {
-                        color: colors[1]
+                        color: colors[1],
+                        fontSize: 18
                     }
                 },
                 axisLabel: {
-                    // containLabel: true,
-                    formatter: '{value}'
+                    show: false,
+                    //containLabel: true,
+                    formatter: ''
                 }
             },
             {
-                show: false,
+                //show: false,
                 type: 'value',
-                name: 'Sõnu',
+                name: '',
+                
                 position: 'right',
-                offset: 105,
                 axisLine: {
                     show: true,
                     lineStyle: {
-                        containLabel: true,
-                        color: colors[2]
+                        color: colors[1],
+                        fontSize: 18
                     }
                 },
                 axisLabel: {
-                    formatter: '{value}'
+                    show: false,
+                    //containLabel: true,
+                    formatter: ''
                 }
             },
             {
-                show: false,
+                //show: false,
                 type: 'value',
-                name: 'Lauseid',
-                position: 'left',
+                name: '',
+                
+                position: 'right',
                 axisLine: {
                     show: true,
                     lineStyle: {
-                        color: colors[3]
-                    }
-                },
-                // axisLabel: {
-                //     containLabel: true,
-                //     formatter: '{value}'
-                // }
-            },
-            {
-                show: false,
-                type: 'value',
-                name: 'Vigu',
-                position: 'left',
-                offset: 75,
-                axisLine: {
-                    show: true,
-                    lineStyle: {
-                        color: colors[4]
+                        color: colors[1],
+                        fontSize: 18
                     }
                 },
                 axisLabel: {
-                    containLabel: true,
-                    formatter: '{value}'
+                    show: false,
+                    //containLabel: true,
+                    formatter: ''
                 }
             },
             {
-                show: false,
+                //show: false,
                 type: 'value',
-                name: 'Veatüüpe',
-                position: 'left',
-                offset: 145,
+                name: '',
+                
+                position: 'right',
                 axisLine: {
                     show: true,
                     lineStyle: {
-                        color: colors[5]
+                        color: colors[1],
+                        fontSize: 18
                     }
                 },
                 axisLabel: {
-                    containLabel: true,
-                    formatter: '{value}'
+                    show: false,
+                    //containLabel: true,
+                    formatter: ''
+                }
+            },
+            {
+                //show: false,
+                type: 'value',
+                name: '',
+                
+                position: 'right',
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: colors[1],
+                        fontSize: 18
+                    }
+                },
+                axisLabel: {
+                    show: false,
+                    //containLabel: true,
+                    formatter: ''
                 }
             }
         ],
@@ -502,68 +590,3 @@ function loadStats(data) {
     };
     option && myChart.setOption(option);
 }
-
-
-// Echarts pie chart
-function loadLanguagePercentage(data) {
-    var chartDom = document.getElementById('languagePercentage');
-    var myChart = echarts.init(chartDom);
-    var option;
-
-    //responsive width
-    $(window).on('resize', function () {
-        myChart.resize();
-    });
-
-    // get data
-    let pieData = [];
-    data.forEach((e) => {
-        if (e.tekstikeel == null) {
-            pieData.push({ value: e.protsent, name: "TUNDMATU" });
-        } else {
-            pieData.push({ value: e.protsent, name: e.tekstikeel.toUpperCase() });
-        }
-    });
-
-    // chart settings
-    option = {
-        tooltip: {
-            trigger: 'item',
-        },
-        toolbox: {
-            show: true,
-            left: "center",
-            bottom: "bottom",
-            color: '#333',
-            itemSize: 30,
-            itemGap: 100,
-            feature: {
-                dataView: { show: true, readOnly: true, title: "Andmed" },
-                saveAsImage: { show: true, title: "Laadi alla", color: "red" }
-            }
-        },
-        legend: {
-            orient: 'horizontal',
-            left: "center",
-            top: 0
-        },
-        series: [
-            {
-                name: 'Test',
-                type: 'pie',
-                radius: '70%',
-                data: pieData,
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }
-        ]
-    };
-
-    option && myChart.setOption(option);
-}
-
