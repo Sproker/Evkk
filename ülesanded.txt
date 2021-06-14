@@ -11,3 +11,7 @@ https://docs.google.com/document/d/1TwvqUsvuAngfwc50Zzkx2qZ3wpVfIk1jv0SJTUQww4g/
 
 Dropdown:
 https://mdbootstrap.com/snippets/jquery/mdbootstrap/887912#html-tab-view
+
+Free bootstrap
+
+https://freefrontend.com/bootstrap-multiselect-boxes/
