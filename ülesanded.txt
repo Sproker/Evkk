@@ -1,0 +1,6 @@
+1) korpuseid saab filtreerida mitme filtriga (tunnustega pärid andmebaasist kindlaid tekste)
+2) filtrid grupeerida üldistesse gruppidesse (korpuste tunnused, teksti autori tunnused, teksti tunnused). Selleks võite vaadata skeemi jagatud Drive'is või saada inspiratsiooni joonistest ülalt.
+3) Sama skeemi alusel lasta valida, mida üldse kuvada statistikalehel.
+4) kui teha kihtdiagrammi, siis lisada veel nupp, mis lisaks uue kihi andmeid
+
+https://drive.google.com/file/d/1gVapEd30FPgtUIkBfFpBNjAAo9tRb0hb/view 
