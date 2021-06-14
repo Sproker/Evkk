@@ -8,3 +8,6 @@ https://drive.google.com/file/d/1gVapEd30FPgtUIkBfFpBNjAAo9tRb0hb/view
 
 Veemi dokument:
 https://docs.google.com/document/d/1TwvqUsvuAngfwc50Zzkx2qZ3wpVfIk1jv0SJTUQww4g/edit?ts=60c359f7#
+
+Dropdown:
+https://mdbootstrap.com/snippets/jquery/mdbootstrap/887912#html-tab-view
