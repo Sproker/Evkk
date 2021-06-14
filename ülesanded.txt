@@ -3,4 +3,8 @@
 3) Sama skeemi alusel lasta valida, mida üldse kuvada statistikalehel.
 4) kui teha kihtdiagrammi, siis lisada veel nupp, mis lisaks uue kihi andmeid
 
+Skeem:
 https://drive.google.com/file/d/1gVapEd30FPgtUIkBfFpBNjAAo9tRb0hb/view 
+
+Veemi dokument:
+https://docs.google.com/document/d/1TwvqUsvuAngfwc50Zzkx2qZ3wpVfIk1jv0SJTUQww4g/edit?ts=60c359f7#
